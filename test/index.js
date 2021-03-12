@@ -148,6 +148,54 @@ test('delay, false, callback', function () {
 	);
 });
 
+test('delay false callback undefined true', function () {
+	expect(8);
+	stop();
+
+	/*eslint no-undefined: 0*/
+	let callCount = 0;
+	let throttled = throttle(delay * 10, false, function () {
+		callCount += 1;
+	}, undefined, true);
+
+	ok(!throttled.isPending(), 'callback should not be pending');
+
+	throttled.call();
+
+	ok(callCount === 0, 'first call should not execute');
+	
+	setTimeout(function () {
+		ok(throttled.isPending(), 'finished initial call, callback should not be pending');
+	}, delay);
+
+
+	setTimeout(function () {
+		throttled.call();
+	}, delay * 2);
+
+	setTimeout(function () {
+		ok(throttled.isPending(), 'callback should be pending');
+	}, delay * 5);
+
+	setTimeout(function () {
+		ok(callCount === 1, 'should have executed once');
+		ok(!throttled.isPending(), 'finished call, callback should not be pending');
+	}, delay * 11);
+
+	setTimeout(function () {
+		throttled.call();
+		ok(callCount === 1, 'should not be called')
+	}, delay * 21);
+
+	setTimeout(function () {
+		ok(callCount === 2, 'should have been called')
+		start();
+	}, delay * 32);
+
+
+});
+
+
 test('delay, true, callback', function () {
 	expect(7);
 	stop();

@@ -13,10 +13,12 @@
  *                                    to `callback` when the throttled-function is executed.
  * @param  {boolean}   [debounceMode] - If `debounceMode` is true (at begin), schedule `clear` to execute after `delay` ms. If `debounceMode` is false (at end),
  *                                    schedule `callback` to execute after `delay` ms.
+ * @param {boolean}    [skipFirst] - in throttle mode, if `skipFirst` is true, if not currently throttled it will
+ * 										skip the first invocation.
  *
  * @returns {Function}  A new, throttled, function.
  */
-export default function (delay, noTrailing, callback, debounceMode) {
+export default function (delay, noTrailing, callback, debounceMode, skipFirst) {
 	/*
 	 * After wrapper has stopped being called, this timeout ensures that
 	 * `callback` is executed at the proper times in `throttle` and `end`
@@ -91,6 +93,12 @@ export default function (delay, noTrailing, callback, debounceMode) {
 		}
 
 		clearExistingTimeout();
+
+		// skipFirst
+		if (skipFirst && debounceMode === undefined && elapsed > delay + 2) {
+			lastExec = Date.now();
+			elapsed = Date.now() - lastExec;
+		}
 
 		if (debounceMode === undefined && elapsed > delay) {
 			/*
